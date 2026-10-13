@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutraAI — Your AI Health Companion</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <!-- ONBOARDING -->
+  <div class="screen active" id="screen-onboard">
+    <div class="onboard-wrap">
+      <div class="brand">
+        <div class="brand-icon"><i class="ti ti-heartbeat"></i></div>
+        <div class="brand-name">NutraAI</div>
+        <div class="brand-sub">Your AI health companion</div>
+      </div>
+      <div class="card">
+        <div class="input-row"><label>Full name</label><input type="text" id="ob-name" placeholder="e.g. Rahim Ahmed"></div>
+        <div class="input-row"><label>Email</label><input type="email" id="ob-email" placeholder="your@email.com"></div>
+        <div class="row2">
+          <div class="input-row"><label>Age</label><input type="number" id="ob-age" placeholder="25" min="10" max="100"></div>
+          <div class="input-row"><label>Gender</label><select id="ob-gender"><option>Male</option><option>Female</option><option>Other</option></select></div>
+        </div>
+        <div class="row2">
+          <div class="input-row"><label>Height (cm)</label><input type="number" id="ob-height" placeholder="170" min="100" max="250"></div>
+          <div class="input-row"><label>Weight (kg)</label><input type="number" id="ob-weight" placeholder="70" min="30" max="300"></div>
+        </div>
+        <div class="input-row"><label>Activity level</label>
+          <select id="ob-activity">
+            <option value="1.2">Sedentary (desk job)</option>
+            <option value="1.375">Lightly active</option>
+            <option value="1.55" selected>Moderately active</option>
+            <option value="1.725">Very active</option>
+            <option value="1.9">Athlete</option>
+          </select>
+        </div>
+        <div class="input-row"><label>Health goal</label>
+          <select id="ob-goal">
+            <option value="loss">Weight loss</option>
+            <option value="maintain" selected>Maintain weight</option>
+            <option value="gain">Weight gain</option>
+            <option value="muscle">Muscle building</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="completeOnboard()">Get started</button>
+        <p class="signin-link">Already have an account? <a href="#" onclick="completeOnboard(); return false;">Sign in</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen" id="screen-home">
+    <div class="topbar">
+      <div><div class="topbar-greeting">Good morning,</div><div class="topbar-name" id="home-name">User</div></div>
+      <div class="topbar-right"><i class="ti ti-bell topbar-icon"></i><div class="avatar" id="home-avatar">U</div></div>
+    </div>
+    <div class="scroll-body">
+      <div class="metric-row">
+        <div class="metric"><div class="metric-val green" id="h-score">82</div><div class="metric-lbl">Health score</div></div>
+        <div class="metric"><div class="metric-val" id="h-cal">0</div><div class="metric-lbl">Cal left</div></div>
+        <div class="metric"><div class="metric-val blue" id="h-water">0/8</div><div class="metric-lbl">Water glasses</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Today's calories</span><span class="pill pill-green" id="h-cal-pct">0% of goal</span></div>
+        <div class="progress-wrap"><div class="progress-fill" id="cal-bar" style="width:0%"></div></div>
+        <div class="progress-labels"><span id="cal-consumed">0 consumed</span><span id="cal-goal-lbl">Goal: 0</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">Today's meals</div>
+        <div id="home-meals-list"><div class="empty-state">No meals logged yet. Scan your first meal!</div></div>
+        <button class="btn btn-primary" style="margin-top:10px" onclick="showScreen('screen-scan')"><i class="ti ti-camera"></i> Scan meal</button>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Weekly streak</span><span class="pill pill-green">5 days</span></div>
+        <div class="streak-row" id="streak-row"></div>
+      </div>
+      <div class="card card-link" onclick="showScreen('screen-health')">
+        <div class="card-header">
+          <div><div class="card-title">BMI status</div><div class="card-sub" id="h-bmi-label">— · fill in your profile</div></div>
+          <i class="ti ti-chevron-right icon-muted"></i>
+        </div>
+      </div>
+    </div>
+    <nav class="nav-bar">
+      <button class="nav-btn active" onclick="switchNav(this,'screen-home')"><i class="ti ti-home"></i>Home</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-scan')"><i class="ti ti-camera"></i>Scan</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-health')"><i class="ti ti-chart-bar"></i>Health</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-coach')"><i class="ti ti-robot"></i>AI Coach</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-doctors')"><i class="ti ti-stethoscope"></i>Doctors</button>
+    </nav>
+  </div>
+
+  <!-- FOOD SCAN -->
+  <div class="screen" id="screen-scan">
+    <div class="topbar">
+      <button class="back-btn" onclick="showScreen('screen-home')"><i class="ti ti-arrow-left"></i></button>
+      <h2 class="topbar-title">Scan meal</h2>
+    </div>
+    <div class="scroll-body">
+      <div id="scan-input-area">
+        <div class="scan-area" onclick="document.getElementById('food-input').focus()">
+          <i class="ti ti-camera scan-icon"></i>
+          <p>Tap to describe or photograph your meal</p>
+        </div>
+        <div class="input-row" style="margin-top:12px">
+          <label>Describe your meal</label>
+          <input type="text" id="food-input" placeholder="e.g. Chicken biryani, large portion">
+        </div>
+        <div class="row2">
+          <div class="input-row"><label>Portion size</label>
+            <select id="portion-select">
+              <option value="0.5">Small (0.5x)</option>
+              <option value="1" selected>Regular (1x)</option>
+              <option value="1.5">Large (1.5x)</option>
+              <option value="2">Extra large (2x)</option>
+            </select>
+          </div>
+          <div class="input-row"><label>Meal type</label>
+            <select id="meal-type-select">
+              <option>Breakfast</option><option selected>Lunch</option><option>Dinner</option><option>Snack</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="runFoodScan()"><i class="ti ti-wand"></i> Analyze with AI</button>
+      </div>
+      <div id="scan-loading" style="display:none">
+        <div class="loading-box">
+          <div class="dot-anim"><span></span><span></span><span></span></div>
+          <div class="loading-msg" id="scan-loading-msg">Analyzing your meal...</div>
+        </div>
+      </div>
+      <div id="scan-result" style="display:none">
+        <div class="result-food-card">
+          <div class="result-food-name" id="res-food-name">—</div>
+          <div class="result-food-conf" id="res-conf">AI confidence: —</div>
+        </div>
+        <div class="macro-grid">
+          <div class="macro-cell"><div class="macro-val" id="res-cal">—</div><div class="macro-lbl">kcal</div></div>
+          <div class="macro-cell"><div class="macro-val" id="res-prot">—</div><div class="macro-lbl">protein</div></div>
+          <div class="macro-cell"><div class="macro-val" id="res-carbs">—</div><div class="macro-lbl">carbs</div></div>
+          <div class="macro-cell"><div class="macro-val" id="res-fat">—</div><div class="macro-lbl">fat</div></div>
+        </div>
+        <div id="res-nutrients" class="card" style="margin-top:10px"></div>
+        <div id="res-ai-tip" class="tip-card" style="margin-top:10px"></div>
+        <div class="row2" style="margin-top:10px">
+          <button class="btn btn-outline" onclick="resetScan()">Re-scan</button>
+          <button class="btn btn-primary" onclick="logMeal()">Log meal</button>
+        </div>
+      </div>
+    </div>
+    <nav class="nav-bar">
+      <button class="nav-btn" onclick="switchNav(this,'screen-home')"><i class="ti ti-home"></i>Home</button>
+      <button class="nav-btn active" onclick="switchNav(this,'screen-scan')"><i class="ti ti-camera"></i>Scan</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-health')"><i class="ti ti-chart-bar"></i>Health</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-coach')"><i class="ti ti-robot"></i>AI Coach</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-doctors')"><i class="ti ti-stethoscope"></i>Doctors</button>
+    </nav>
+  </div>
+
+  <!-- HEALTH -->
+  <div class="screen" id="screen-health">
+    <div class="topbar">
+      <button class="back-btn" onclick="showScreen('screen-home')"><i class="ti ti-arrow-left"></i></button>
+      <h2 class="topbar-title">Health overview</h2>
+    </div>
+    <div class="scroll-body">
+      <div class="card text-center">
+        <div class="section-label">Health score</div>
+        <div class="score-big green" id="health-score-big">82</div>
+        <div class="section-label">out of 100</div>
+        <div style="margin-top:8px" id="health-score-pills"></div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">BMI calculator</div>
+        <div class="row2">
+          <div class="input-row"><label>Height (cm)</label><input type="number" id="bmi-height" placeholder="170" oninput="calcBMI()"></div>
+          <div class="input-row"><label>Weight (kg)</label><input type="number" id="bmi-weight" placeholder="70" oninput="calcBMI()"></div>
+        </div>
+        <div id="bmi-result" style="display:none">
+          <div class="bmi-display">
+            <div class="bmi-number" id="bmi-val">—</div>
+            <div><span class="pill" id="bmi-cat">—</span><div class="section-label" style="margin-top:4px">BMI</div></div>
+          </div>
+          <div class="bmi-bar">
+            <div class="bmi-seg" style="background:#85B7EB"></div>
+            <div class="bmi-seg" style="background:#97C459;flex:1.5"></div>
+            <div class="bmi-seg" style="background:#EF9F27;flex:1.5"></div>
+            <div class="bmi-seg" style="background:#E24B4A;flex:2"></div>
+          </div>
+          <div class="bmi-labels"><span>Underweight</span><span>Normal</span><span>Overweight</span><span>Obese</span></div>
+          <div class="bmi-reco" id="bmi-reco"></div>
+        </div>
+      </div>
+      <div class="card"><div class="card-title" style="margin-bottom:10px">Daily targets</div><div id="targets-list"></div></div>
+      <div class="card"><div class="card-title" style="margin-bottom:8px">Nutrient balance today</div><div id="nutr-bars"></div></div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">Water intake</div>
+        <div class="water-grid" id="water-glasses"></div>
+        <button class="btn btn-outline" style="margin-top:10px" onclick="addWater()">+ Add glass</button>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px">Sleep tracker</div>
+        <div class="sleep-grid">
+          <div class="sleep-cell"><div class="sleep-val" id="sleep-hours">7.5</div><div class="sleep-lbl">Hours slept</div></div>
+          <div class="sleep-cell"><div class="sleep-val green">88</div><div class="sleep-lbl">Sleep score</div></div>
+          <div class="sleep-cell"><div class="sleep-val">10:30</div><div class="sleep-lbl">Bedtime</div></div>
+        </div>
+        <div class="row2" style="margin-top:8px">
+          <div class="input-row"><label>Bedtime</label><input type="time" id="sleep-bed" value="22:30" oninput="updateSleep()"></div>
+          <div class="input-row"><label>Wake time</label><input type="time" id="sleep-wake" value="06:00" oninput="updateSleep()"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title" style="margin-bottom:4px">Disease risk estimate</div>
+        <div class="disclaimer">Informational only — not a medical diagnosis</div>
+        <div id="risk-rows" style="margin-top:10px"></div>
+      </div>
+    </div>
+    <nav class="nav-bar">
+      <button class="nav-btn" onclick="switchNav(this,'screen-home')"><i class="ti ti-home"></i>Home</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-scan')"><i class="ti ti-camera"></i>Scan</button>
+      <button class="nav-btn active" onclick="switchNav(this,'screen-health')"><i class="ti ti-chart-bar"></i>Health</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-coach')"><i class="ti ti-robot"></i>AI Coach</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-doctors')"><i class="ti ti-stethoscope"></i>Doctors</button>
+    </nav>
+  </div>
+
+  <!-- AI COACH -->
+  <div class="screen" id="screen-coach">
+    <div class="topbar">
+      <button class="back-btn" onclick="showScreen('screen-home')"><i class="ti ti-arrow-left"></i></button>
+      <h2 class="topbar-title">AI health coach</h2>
+      <span class="pill pill-green" style="font-size:10px;margin-left:auto">Claude AI</span>
+    </div>
+    <div id="chat-messages" class="chat-body">
+      <div class="chat-msg ai"><div class="bubble">Hi! I'm your AI health coach. I know your health profile and today's activity. Ask me anything — what to eat, exercise tips, or how you're doing today.</div></div>
+    </div>
+    <div class="chat-input-row">
+      <input type="text" id="coach-input" placeholder="Ask your health coach..." onkeydown="if(event.key==='Enter')sendCoachMsg()">
+      <button class="chat-send" onclick="sendCoachMsg()"><i class="ti ti-send"></i></button>
+    </div>
+    <nav class="nav-bar">
+      <button class="nav-btn" onclick="switchNav(this,'screen-home')"><i class="ti ti-home"></i>Home</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-scan')"><i class="ti ti-camera"></i>Scan</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-health')"><i class="ti ti-chart-bar"></i>Health</button>
+      <button class="nav-btn active" onclick="switchNav(this,'screen-coach')"><i class="ti ti-robot"></i>AI Coach</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-doctors')"><i class="ti ti-stethoscope"></i>Doctors</button>
+    </nav>
+  </div>
+
+  <!-- DOCTORS -->
+  <div class="screen" id="screen-doctors">
+    <div class="topbar">
+      <button class="back-btn" onclick="showScreen('screen-home')"><i class="ti ti-arrow-left"></i></button>
+      <h2 class="topbar-title">Doctor marketplace</h2>
+    </div>
+    <div class="scroll-body">
+      <div class="filter-row" id="doc-filters">
+        <button class="pill pill-green filter-btn active" onclick="filterDocs('All',this)">All</button>
+        <button class="pill pill-muted filter-btn" onclick="filterDocs('Nutritionist',this)">Nutritionist</button>
+        <button class="pill pill-muted filter-btn" onclick="filterDocs('Dietitian',this)">Dietitian</button>
+        <button class="pill pill-muted filter-btn" onclick="filterDocs('Physician',this)">Physician</button>
+      </div>
+      <div id="doctors-list"></div>
+    </div>
+    <nav class="nav-bar">
+      <button class="nav-btn" onclick="switchNav(this,'screen-home')"><i class="ti ti-home"></i>Home</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-scan')"><i class="ti ti-camera"></i>Scan</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-health')"><i class="ti ti-chart-bar"></i>Health</button>
+      <button class="nav-btn" onclick="switchNav(this,'screen-coach')"><i class="ti ti-robot"></i>AI Coach</button>
+      <button class="nav-btn active" onclick="switchNav(this,'screen-doctors')"><i class="ti ti-stethoscope"></i>Doctors</button>
+    </nav>
+  </div>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>
